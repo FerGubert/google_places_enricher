@@ -3,6 +3,23 @@ from config import *
 import argparse
 
 def main():
+    """
+    Retrieve the argument passed by the user.
+
+    Parameters
+    ----------
+    No Parameters.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    argparse.ArgumentParser
+        Argument name and the content passed by the user.
+    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--flow', dest='flow')
     args = parser.parse_args()
@@ -19,19 +36,12 @@ if __name__== "__main__" :
                 SOUTHWEST_LAT,
                 SOUTHWEST_LON]
 
-    if args.flow == 'coordinates':
-        if all(env_vars):
+    if (args.flow == 'coordinates') and (all(env_vars)):
             print(calculate_coordinates())
-        else:
-            print('[ERROR] Invalid environment variables.')
-    elif args.flow == 'request':
-        if RADIUS != 0:
+    elif (args.flow == 'request') and (RADIUS != 0):
             #print(request_google_places())
             print('OK')
-        else:
-            print('[ERROR] Invalid environment variable.')
     else:
-        # erro
-        pass
+        print('[ERROR] Invalid environment variables.')
 
 

@@ -1,11 +1,28 @@
-from config import *
-from utils import initialize_variables, make_request, export_data
-import pandas as pd
+from config import RADIUS, NORTHEAST_LAT, NORTHEAST_LON, SOUTHWEST_LAT, SOUTHWEST_LON
+from utils import *
 import time
 import shapely.geometry
 import pyproj
 
 def calculate_coordinates():
+    """
+    Generates a csv file with the geographic coordinates of a rectangular area 
+    and according to a predetermined step in meters.
+
+    Parameters
+    ----------
+    No Parameters.
+
+    Raises
+    ------
+    No raises.
+
+    Returns
+    -------
+    str
+        Message indicating the end of execution.
+    """
+
     to_proxy_transformer = pyproj.Transformer.from_crs('epsg:4326', 'epsg:3857')
     to_original_transformer = pyproj.Transformer.from_crs('epsg:3857', 'epsg:4326')
 
@@ -35,39 +52,53 @@ def calculate_coordinates():
     return 'Execution performed successfully.'
 
 def request_google_places():
-    try:
-        df_latlon = pd.read_csv('../data/input/latlon.csv', sep=';')
-    except:
-        return '[ERROR] Coordinate file not found.'
-    if len(df_latlon) == 0:
-        return '[ERROR] Empty coordinate file.'
+    """
+    Performs requests to the google places api, according to the geographic coordinates
+    defined in the input file and a predetermined radius. 
+    It enriches the data according to the categories also defined in the input file
+    and handles the return of the api, making the data available in a csv file.
 
-    try:  
-        df_categories = pd.read_csv('../data/input/categories.csv', sep=';')
-    except:
-        return '[ERROR] Category file not found.'
+    Parameters
+    ----------
+    No Parameters.
+
+    Raises
+    ------
+    FileNotFound
+        If the coordinates or categories file is not found in the target folder.
+    ErrorStatusMessage
+        if the google places api return has a status other than OK.
+
+    Returns
+    -------
+    str
+        Message indicating if the flow was executed successfully or 
+        otherwise the error that interrupted the execution.
+    """
+
+    df_latlon = read_file('Coordinate', '../data/input/latlon.csv')
+    if type(df_latlon)==str:
+        return df_latlon
+
+    df_categories = read_file('Category', '../data/input/categories.csv')
+    if type(df_categories)==str:
+        return df_categories
     if len(df_categories) == 0:
         df_categories.loc[0] = ['']
 
     establishments_features_data, establishments_features_labels = initialize_variables()
 
-    radius = '&radius=' + RADIUS
     for lat_lon in df_latlon.iterrows():
         lat = lat_lon[1]['lat']
         lon = lat_lon[1]['lon']
         
-        location = '&location=' + str(lat) + ',' + str(lon)
-        
         for cat in df_categories['category']:
             establishments = []
-            
-            establishment_keyword = '&keyword=' + cat
 
-            URL = GOOGLE_MAPS_API + API + SEARCH_COMPONENT + OUTPUT_TYPE + KEY + location + radius + establishment_keyword
-
-            results = make_request(URL)
+            url = create_url(lat, lon, cat)
+            results = make_request(url)
             if not results['status'] == 'OK':
-                return '[ERROR] '+results['status']+': '+results['error_message']
+                return '[ERROR] {:s}: {:s}.'.format(results['status'], results['error_message'])
 
             establishments.extend(results['results'])
 
@@ -77,9 +108,9 @@ def request_google_places():
             while "next_page_token" in results:
                 pages += 1
                 params['pagetoken'] = results['next_page_token']
-                results = make_request(URL, params)
+                results = make_request(url, params)
                 if not results['status'] == 'OK':
-                    return '[ERROR] '+results['status']+': '+results['error_message']
+                    return '[ERROR] {:s}: {:s}.'.format(results['status'], results['error_message'])
                 establishments.extend(results['results'])
                 time.sleep(2)
 
