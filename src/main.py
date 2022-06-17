@@ -42,6 +42,6 @@ if __name__== "__main__" :
             #print(request_google_places())
             print('OK')
     else:
-        print('[ERROR] Invalid environment variables.')
+        print('[ERROR] Invalid environment variables or invalid argument.')
 
 

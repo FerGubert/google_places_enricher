@@ -53,10 +53,10 @@ def calculate_coordinates():
 
 def request_google_places():
     """
-    Performs requests to the google places api, according to the geographic coordinates
+    Performs requests to the google places API, according to the geographic coordinates
     defined in the input file and a predetermined radius. 
     It enriches the data according to the categories also defined in the input file
-    and handles the return of the api, making the data available in a csv file.
+    and handles the return of the API, making the data available in a csv file.
 
     Parameters
     ----------
@@ -67,7 +67,7 @@ def request_google_places():
     FileNotFound
         If the coordinates or categories file is not found in the target folder.
     ErrorStatusMessage
-        if the google places api return has a status other than OK.
+        if the google places API return has a status other than OK.
 
     Returns
     -------
