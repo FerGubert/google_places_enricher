@@ -26,7 +26,7 @@ if __name__== "__main__" :
             print('[ERROR] Invalid environment variables.')
     elif args.flow == 'request':
         if RADIUS != 0:
-            #request_google_places()
+            #print(request_google_places())
             print('OK')
         else:
             print('[ERROR] Invalid environment variable.')

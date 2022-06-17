@@ -34,16 +34,24 @@ def calculate_coordinates():
 
     return 'Execution performed successfully.'
 
-def request_google_places(radius):
-    df_latlon = pd.read_csv('../data/input/latlon.csv', sep=';')
+def request_google_places():
+    try:
+        df_latlon = pd.read_csv('../data/input/latlon.csv', sep=';')
+    except:
+        return '[ERROR] Coordinate file not found.'
     if len(df_latlon) == 0:
         return '[ERROR] Empty coordinate file.'
-        
-    df_categories = pd.read_csv('../data/input/categories.csv', sep=';')
+
+    try:  
+        df_categories = pd.read_csv('../data/input/categories.csv', sep=';')
+    except:
+        return '[ERROR] Category file not found.'
+    if len(df_categories) == 0:
+        df_categories.loc[0] = ['']
 
     establishments_features_data, establishments_features_labels = initialize_variables()
 
-    radius = '&radius=' + radius
+    radius = '&radius=' + RADIUS
     for lat_lon in df_latlon.iterrows():
         lat = lat_lon[1]['lat']
         lon = lat_lon[1]['lon']
@@ -58,6 +66,9 @@ def request_google_places(radius):
             URL = GOOGLE_MAPS_API + API + SEARCH_COMPONENT + OUTPUT_TYPE + KEY + location + radius + establishment_keyword
 
             results = make_request(URL)
+            if not results['status'] == 'OK':
+                return '[ERROR] '+results['status']+': '+results['error_message']
+
             establishments.extend(results['results'])
 
             pages = 1
@@ -67,6 +78,8 @@ def request_google_places(radius):
                 pages += 1
                 params['pagetoken'] = results['next_page_token']
                 results = make_request(URL, params)
+                if not results['status'] == 'OK':
+                    return '[ERROR] '+results['status']+': '+results['error_message']
                 establishments.extend(results['results'])
                 time.sleep(2)
 
@@ -81,3 +94,4 @@ def request_google_places(radius):
                 establishments_features_data[len(establishments_features_data)-1].append(cat)
 
     export_data(establishments_features_labels, establishments_features_data)
+    return 'Execution performed successfully.'
