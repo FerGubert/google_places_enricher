@@ -76,7 +76,7 @@ def request_google_places():
         otherwise the error that interrupted the execution.
     """
 
-    df_latlon = read_file('Coordinate', '../data/input/latlon.csv')
+    df_latlon = read_file('Coordinate', '../data/input/lat_lon.csv')
     if type(df_latlon)==str:
         return df_latlon
 

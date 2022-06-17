@@ -54,7 +54,7 @@ First, it is necessary to set the variable described below in the file `config.p
 
 * RADIUS: indicates the range for each coordinate that will be used in the request.
 
-It is also necessary to provide in `data/input` a csv file with the geographic coordinates that will be used in the request, as indicated in the `latlon.csv` file. 
+It is also necessary to provide in `data/input` a csv file with the geographic coordinates that will be used in the request, as indicated in the `lat_lon.csv` file. 
 
 If you want to enrich the data obtained from the google places API with more specific categories, a csv file with the desired categories must be made available in the same path or use the categories of the fourth hierarchical level of the Yelp base already available in `/data/input/categories.csv`.
 
