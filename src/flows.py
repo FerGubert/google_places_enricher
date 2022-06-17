@@ -98,6 +98,7 @@ def request_google_places():
             url = create_url(lat, lon, cat)
             results = make_request(url)
             if not results['status'] == 'OK':
+                export_data(establishments_features_labels, establishments_features_data)
                 return '[ERROR] {:s}: {:s}.'.format(results['status'], results['error_message'])
 
             establishments.extend(results['results'])
@@ -110,6 +111,7 @@ def request_google_places():
                 params['pagetoken'] = results['next_page_token']
                 results = make_request(url, params)
                 if not results['status'] == 'OK':
+                    export_data(establishments_features_labels, establishments_features_data)
                     return '[ERROR] {:s}: {:s}.'.format(results['status'], results['error_message'])
                 establishments.extend(results['results'])
                 time.sleep(2)
