@@ -2,6 +2,7 @@ from config import *
 import requests
 import json
 import pandas as pd
+import os
 
 def read_file(name, path_file, sep=';'):
     """
@@ -108,11 +109,12 @@ def create_url(lat, lon, cat):
         Url for the request in the google places API.
     """
 
-    location = '&location=' + str(lat) + ',' + str(lon)
-    radius = '&radius=' + RADIUS
-    establishment_keyword = '&keyword=' + cat
+    location = '&location={:s},{:s}'.format(str(lat), str(lon))
+    radius = '&radius={:s}'.format(str(RADIUS))
+    establishment_keyword = '&keyword={:s}'.format(cat)
+    api_key = '&key={:s}'.format(os.getenv('KEY'))
 
-    return GOOGLE_MAPS_API + API + SEARCH_COMPONENT + OUTPUT_TYPE + KEY + location + radius + establishment_keyword
+    return GOOGLE_MAPS_API + API + SEARCH_COMPONENT + OUTPUT_TYPE + api_key + location + radius + establishment_keyword
 
 def make_request(url, params={}):
     """
@@ -164,4 +166,4 @@ def export_data(establishments_features_labels, establishments_features_data):
     for feature_index in range(len(establishments_features_data)):
         df_final[establishments_features_labels[feature_index]] = establishments_features_data[feature_index]
 
-    df_final.to_csv('../data/output/establishments.csv', index=False)
+    df_final.to_csv('data/output/establishments.csv', index=False)

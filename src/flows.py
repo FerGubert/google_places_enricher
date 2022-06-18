@@ -44,7 +44,7 @@ def calculate_coordinates():
             y += stepsize
         x += stepsize
 
-    with open('../data/output/lat_lon_calculated.csv', 'w') as of:
+    with open('data/output/lat_lon_calculated.csv', 'w') as of:
         of.write('lat;lon\n')
         for p in gridpoints:
             of.write('{:f};{:f}\n'.format(p.x, p.y))
@@ -76,11 +76,11 @@ def request_google_places():
         otherwise the error that interrupted the execution.
     """
 
-    df_latlon = read_file('Coordinate', '../data/input/lat_lon.csv')
+    df_latlon = read_file('Coordinate', 'data/input/lat_lon.csv')
     if type(df_latlon)==str:
         return df_latlon
 
-    df_categories = read_file('Category', '../data/input/categories.csv')
+    df_categories = read_file('Category', 'data/input/categories.csv')
     if type(df_categories)==str:
         return df_categories
     if len(df_categories) == 0:

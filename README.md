@@ -41,7 +41,7 @@ First, it is necessary to set the variables described below in the file `config.
 Then you must pass the argument that indicates this flow when executing the file `main.py`:
 
 ```
-python main.py --flow coordinates
+python src/main.py --flow coordinates
 ```
 
 The calculated coordinates will be available in `data/output/lat_lon_calculated.csv`.
@@ -61,7 +61,7 @@ If you want to enrich the data obtained from the google places API with more spe
 Then you must pass the argument that indicates this flow when executing the file `main.py`:
 
 ```
-python main.py --flow request
+python src/main.py --flow request
 ```
 
 The processed data will be available in `data/output/establishments.csv`.

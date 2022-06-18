@@ -39,8 +39,7 @@ if __name__== "__main__" :
     if (args.flow == 'coordinates') and (all(env_vars)):
             print(calculate_coordinates())
     elif (args.flow == 'request') and (RADIUS != 0):
-            #print(request_google_places())
-            print('OK')
+            print(request_google_places())
     else:
         print('[ERROR] Invalid environment variables or invalid argument.')
 
