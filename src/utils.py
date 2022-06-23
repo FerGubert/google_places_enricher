@@ -59,7 +59,7 @@ def initialize_variables():
     business_status,geometry,name,\
     opening_hours,place_id,price_level,\
     rating,types,user_ratings_total,\
-    vicinity,category = ([], ) * 11
+    vicinity,category = ([] for i in range(11))
 
     establishments_features_data = [business_status, 
                                     geometry, name, 
