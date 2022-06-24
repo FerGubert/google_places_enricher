@@ -3,6 +3,7 @@ import requests
 import json
 import pandas as pd
 import os
+import re
 
 def read_file(name, path_file, sep=';'):
     """
@@ -141,9 +142,9 @@ def make_request(url, params={}):
     results = json.loads(res.content)
     return results
 
-def export_data(establishments_features_labels, establishments_features_data):
+def create_dataframe(establishments_features_labels, establishments_features_data):
     """
-    Save data in csv file.
+    Structure the data in a dataframe format.
 
     Parameters
     ----------
@@ -158,12 +159,55 @@ def export_data(establishments_features_labels, establishments_features_data):
 
     Returns
     -------
-    No Returns.
+    pandas.core.frame.DataFrame
+        The data in new structure.
     """
 
     df_final = pd.DataFrame()
 
     for feature_index in range(len(establishments_features_data)):
         df_final[establishments_features_labels[feature_index]] = establishments_features_data[feature_index]
+    
+    return df_final
 
-    df_final.to_csv('data/output/establishments.csv', index=False)
+def treat_data(df):
+    """
+    Performs a treatment on the data, eliminating the json format of the location field and 
+    making aggregations to keep only single establishments.
+
+    Parameters
+    ----------
+    df: pandas.core.frame.DataFrame
+        The data to be processed.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    pandas.core.frame.DataFrame
+        The processed data.
+    """
+
+    df_estab_cat = df.groupby('place_id')[['geometry', 'category']].agg(['unique'])
+
+    lat = []
+    lon = []
+    for coordinates in df_estab_cat['geometry']['unique']:
+        coordinates_numbers = [float(s) for s in re.findall(r'-?\d+\.?\d*', str(coordinates))]
+        lat.append(coordinates_numbers[0])
+        lon.append(coordinates_numbers[1])
+    df_estab_cat['lat'] = lat
+    df_estab_cat['lon'] = lon
+
+    df_estab_cat.columns = ['_'.join(col) for col in df_estab_cat.columns]
+    df_estab_cat.reset_index(inplace=True)
+    df_estab_cat.rename(columns={'category_unique': 'categories', 'lat_': 'lat', 'lon_': 'lon', 'place_id_': 'place_id'}, inplace=True)
+
+    df_place_id = df.drop_duplicates(subset="place_id")
+    df_place_id.drop(columns=['geometry', 'opening_hours', 'category'], inplace=True)
+    df_final = df_estab_cat.merge(df_place_id, on='place_id', how='left')
+    df_final.drop(columns=['geometry_unique', 'index'], inplace=True)
+
+    return df_final

@@ -126,5 +126,8 @@ def request_google_places():
                 
                 establishments_features_data[len(establishments_features_data)-1].append(cat)
 
-    export_data(establishments_features_labels, establishments_features_data)
+
+    df_raw = create_dataframe(establishments_features_labels, establishments_features_data)
+    df_trusted = treat_data(df_raw)
+    df_trusted.to_csv('data/output/establishments.csv', index=False)
     return 'Execution performed successfully.'
