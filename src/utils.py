@@ -189,7 +189,8 @@ def treat_data(df):
     pandas.core.frame.DataFrame
         The processed data.
     """
-
+ 
+    df['geometry'] = df['geometry'].astype(str)
     df_estab_cat = df.groupby('place_id')[['geometry', 'category']].agg(['unique'])
 
     lat = []
@@ -208,6 +209,6 @@ def treat_data(df):
     df_place_id = df.drop_duplicates(subset="place_id")
     df_place_id.drop(columns=['geometry', 'opening_hours', 'category'], inplace=True)
     df_final = df_estab_cat.merge(df_place_id, on='place_id', how='left')
-    df_final.drop(columns=['geometry_unique', 'index'], inplace=True)
+    df_final.drop(columns=['geometry_unique'], inplace=True)
 
     return df_final
