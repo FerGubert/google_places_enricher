@@ -212,3 +212,27 @@ def treat_data(df):
     df_final.drop(columns=['geometry_unique'], inplace=True)
 
     return df_final
+
+def export_data(establishments_features_labels, establishments_features_data):
+    """
+    Performs data processing and save data in csv file.
+
+    Parameters
+    ----------
+    establishments_features_labels: list
+        A list of strings with column names from the csv file.
+    establishments_features_data: list
+        A list of lists, each containing data from one of the fields in the csv file.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    No Returns.
+    """
+
+    df_raw = create_dataframe(establishments_features_labels, establishments_features_data)
+    df_trusted = treat_data(df_raw)
+    df_trusted.to_csv('data/output/establishments.csv', index=False)

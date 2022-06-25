@@ -99,7 +99,8 @@ def request_google_places():
             results = make_request(url)
             if not results['status'] == 'OK':
                 export_data(establishments_features_labels, establishments_features_data)
-                return '[ERROR] {:s}: {:s}.'.format(results['status'], results['error_message'])
+                return '[ERROR] {:s}: {:s}\nHowever the data that could be collected were exported.'\
+                        .format(results['status'], results['error_message'])
 
             establishments.extend(results['results'])
 
@@ -112,7 +113,8 @@ def request_google_places():
                 results = make_request(url, params)
                 if not results['status'] == 'OK':
                     export_data(establishments_features_labels, establishments_features_data)
-                    return '[ERROR] {:s}: {:s}.'.format(results['status'], results['error_message'])
+                    return '[ERROR] {:s}: {:s}.\nHowever the data that could be collected were exported.'\
+                            .format(results['status'], results['error_message'])
                 establishments.extend(results['results'])
                 time.sleep(2)
 
@@ -127,7 +129,5 @@ def request_google_places():
                 establishments_features_data[len(establishments_features_data)-1].append(cat)
 
 
-    df_raw = create_dataframe(establishments_features_labels, establishments_features_data)
-    df_trusted = treat_data(df_raw)
-    df_trusted.to_csv('data/output/establishments.csv', index=False)
+    export_data(establishments_features_labels, establishments_features_data)
     return 'Execution performed successfully.'
