@@ -4,6 +4,7 @@ import json
 import pandas as pd
 import os
 import re
+from sentence_transformers import SentenceTransformer, util
 
 def read_file(name, path_file, sep=';'):
     """
@@ -236,3 +237,91 @@ def export_data(establishments_features_labels, establishments_features_data):
     df_raw = create_dataframe(establishments_features_labels, establishments_features_data)
     df_trusted = treat_data(df_raw)
     df_trusted.to_csv('data/output/establishments.csv', index=False)
+
+def delete_cat_google(categories_google):
+    new_cat_google = []
+    for category in categories_google:
+        if(category == 'point_of_interest') or (category == 'establishment'):
+            continue
+    else:
+        new_cat_google.append(category)
+
+    return new_cat_google
+
+def convert_string_to_list(text, sep):
+    list_final = []
+    items = text.split(sep)
+    for item in items:
+        item = item.replace('\'', '').replace('[', '').replace(']', '').strip()
+        list_final.append(item)
+    return list_final
+
+def create_yelp_phrase(df_categories_yelp):
+    df_categories_yelp['YelpPhrase'] = df_categories_yelp[['YelpParent1', 'YelpParent2', 'YelpParent3', 'YelpLeaf']]\
+                                    .apply(' '.join, axis=1)
+    yelp_phrases = df_categories_yelp['YelpPhrase'].apply(lambda phrase: phrase\
+                                    .replace(' - ', ' ').replace('- ', '').replace(',', ''))
+
+    return yelp_phrases
+
+def create_estab_phrase(df_estab):
+    df_categories_estab = df_estab[['place_id', 'categories', 'types']]
+    df_categories_estab['types_list'] = df_categories_estab['types'].apply(lambda types: convert_string_to_list(types, ','))
+    df_categories_estab['categories_google'] = df_categories_estab['types_list'].apply(lambda types_list: delete_cat_google(types_list))
+    df_categories_estab['categories_enrichment'] = df_categories_estab['categories'].apply(lambda categories: convert_string_to_list(categories, '\' '))
+
+    place_id = []
+    phrase_list = []
+
+    for row in df_categories_estab.iterrows():
+        for cat_enrich in row[1]['categories_enrichment']:
+            phrase = cat_enrich
+            for cat_google in row[1]['categories_google']:
+                phrase = phrase + ' ' + cat_google
+            place_id.append(row[1]['place_id'])
+            phrase_list.append(phrase)
+    
+    df_categories_estab_phrases = pd.DataFrame()
+    df_categories_estab_phrases['place_id'] = place_id
+    df_categories_estab_phrases['phrase_establishment'] = phrase_list
+    df_categories_estab_phrases['phrase_establishment'] = df_categories_estab_phrases['phrase_establishment'].apply(lambda phrase: phrase.replace(',', ''))
+
+    return df_categories_estab_phrases
+
+def calculate_similarity_sentences(sentences_estab, sentences_yelp):
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+
+    embeddings_estab = model.encode(sentences_estab, convert_to_tensor=True)
+    embeddings_yelp = model.encode(sentences_yelp, convert_to_tensor=True)
+
+    cosine_scores = util.cos_sim(embeddings_estab, embeddings_yelp)
+
+    rows = len(sentences_estab)
+    columns = len(sentences_yelp)
+    pairs_final = []
+    for i in range(rows):
+        pairs = []
+        for j in range(columns):
+            pairs.append({'index': [i, j], 'score': cosine_scores[i][j]})
+        pairs_final.append(pairs)
+
+    best_scores = []
+    for pairs in pairs_final:
+        pairs = sorted(pairs, key=lambda x: x['score'], reverse=True)
+        best_scores.append(pairs[0])
+
+    phrase_estab = []
+    phrase_yelp = []
+    score = []
+    for pair in best_scores:
+        i, j = pair['index']
+        phrase_estab.append(sentences_estab[i])
+        phrase_yelp.append(sentences_yelp[j])
+        score.append(round(float(pair['score']), 4))
+
+    df_score = pd.DataFrame()
+    df_score['phrase_establishment'] = phrase_estab
+    df_score['phrase_yelp'] = phrase_yelp
+    df_score['score'] = score
+
+    return df_score

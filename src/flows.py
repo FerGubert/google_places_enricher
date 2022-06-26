@@ -76,11 +76,11 @@ def request_google_places():
         otherwise the error that interrupted the execution.
     """
 
-    df_latlon = read_file('Coordinate', 'data/input/lat_lon.csv')
+    df_latlon = read_file('Coordinates', 'data/input/lat_lon.csv')
     if type(df_latlon)==str:
         return df_latlon
 
-    df_categories = read_file('Category', 'data/input/categories.csv')
+    df_categories = read_file('Categories', 'data/input/categories.csv')
     if type(df_categories)==str:
         return df_categories
     if len(df_categories) == 0:
@@ -122,7 +122,8 @@ def request_google_places():
 
                 for feature_index in range(len(establishments_features_labels)-1):
                     try:
-                        establishments_features_data[feature_index].append(establishment[establishments_features_labels[feature_index]])
+                        establishments_features_data[feature_index]\
+                        .append(establishment[establishments_features_labels[feature_index]])
                     except:
                         establishments_features_data[feature_index].append(None)
                 
@@ -131,3 +132,21 @@ def request_google_places():
 
     export_data(establishments_features_labels, establishments_features_data)
     return 'Execution performed successfully.'
+
+def match_category_phrases():
+    df_categories_yelp = read_file('Hierarchical Yelp categories', 'data/input/hierarchical_yelp_categories.csv')
+    df_categories_yelp['YelpPhrase'] = create_yelp_phrase(df_categories_yelp)
+
+    df_estab = read_file('Establishments', 'data/output/establishments.csv')
+    df_categories_estab_phrases = create_estab_phrase(df_estab)
+
+    df_estab_phrases = df_categories_estab_phrases.merge(df_estab, on='place_id', how='left')
+    df_estab_phrases.drop(columns=['categories', 'types'], inplace=True)
+    df_estab_phrases.to_csv('data/output/establishments_phrases.csv', index=False)
+
+    df_estab_phrases_uniques = df_categories_estab_phrases.drop_duplicates(subset="phrase_establishment")[['phrase_establishment']]
+    df_estab_phrases_uniques['words_phrase_estab'] = df_estab_phrases_uniques['phrase_establishment'].apply(lambda frase: len(frase.split(' ')))
+    df_estab_phrases_uniques = df_estab_phrases_uniques[df_estab_phrases_uniques['words_phrase_estab'] > 1]
+
+    df_score = calculate_similarity_sentences(df_estab_phrases_uniques['phrase_establishment'], df_categories_yelp['YelpPhrase'])
+    df_score.to_csv('data/output/matching_category_phrases.csv', index=False)
