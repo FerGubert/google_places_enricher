@@ -257,9 +257,9 @@ def convert_string_to_list(text, sep):
     return list_final
 
 def create_yelp_phrase(df_categories_yelp):
-    df_categories_yelp['YelpPhrase'] = df_categories_yelp[['YelpParent1', 'YelpParent2', 'YelpParent3', 'YelpLeaf']]\
+    df_categories_yelp['phrase_yelp'] = df_categories_yelp[['parent_1', 'parent_2', 'parent_3', 'leaf']]\
                                     .apply(' '.join, axis=1)
-    yelp_phrases = df_categories_yelp['YelpPhrase'].apply(lambda phrase: phrase\
+    yelp_phrases = df_categories_yelp['phrase_yelp'].apply(lambda phrase: phrase\
                                     .replace(' - ', ' ').replace('- ', '').replace(',', ''))
 
     return yelp_phrases

@@ -80,7 +80,7 @@ def request_google_places():
     if type(df_latlon)==str:
         return df_latlon
 
-    df_categories = read_file('Categories', 'data/input/categories.csv')
+    df_categories = read_file('Categories', 'data/input/categories_request.csv')
     if type(df_categories)==str:
         return df_categories
     if len(df_categories) == 0:
@@ -135,7 +135,7 @@ def request_google_places():
 
 def match_category_phrases():
     df_categories_yelp = read_file('Hierarchical Yelp categories', 'data/input/hierarchical_yelp_categories.csv')
-    df_categories_yelp['YelpPhrase'] = create_yelp_phrase(df_categories_yelp)
+    df_categories_yelp['phrase_yelp'] = create_yelp_phrase(df_categories_yelp)
 
     df_estab = read_file('Establishments', 'data/output/establishments.csv')
     df_categories_estab_phrases = create_estab_phrase(df_estab)
