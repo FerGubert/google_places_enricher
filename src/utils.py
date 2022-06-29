@@ -39,7 +39,7 @@ def read_file(name, path_file, sep=';'):
     
     return df
 
-def initialize_variables():
+def initialize_variables_request():
     """
     Initializes the main variables used in the google places API request.
 
@@ -88,7 +88,7 @@ def initialize_variables():
 
     return establishments_features_data, establishments_features_labels
 
-def create_url(lat, lon, cat):
+def create_url_request(lat, lon, cat):
     """
     Creates the url that will be used to make the request to the google places API.
 
@@ -143,35 +143,7 @@ def make_request(url, params={}):
     results = json.loads(res.content)
     return results
 
-def create_dataframe(establishments_features_labels, establishments_features_data):
-    """
-    Structure the data in a dataframe format.
-
-    Parameters
-    ----------
-    establishments_features_labels: list
-        A list of strings with column names from the csv file.
-    establishments_features_data: list
-        A list of lists, each containing data from one of the fields in the csv file.
-
-    Raises
-    ------
-    No Raises.
-
-    Returns
-    -------
-    pandas.core.frame.DataFrame
-        The data in new structure.
-    """
-
-    df_final = pd.DataFrame()
-
-    for feature_index in range(len(establishments_features_data)):
-        df_final[establishments_features_labels[feature_index]] = establishments_features_data[feature_index]
-    
-    return df_final
-
-def treat_data(df):
+def treat_data_request(df):
     """
     Performs a treatment on the data, eliminating the json format of the location field and 
     making aggregations to keep only single establishments.
@@ -214,9 +186,9 @@ def treat_data(df):
 
     return df_final
 
-def export_data(establishments_features_labels, establishments_features_data):
+def export_data_request(establishments_features_labels, establishments_features_data):
     """
-    Performs data processing and save data in csv file.
+    Create dataframe, performs data processing and save data in csv file.
 
     Parameters
     ----------
@@ -234,8 +206,11 @@ def export_data(establishments_features_labels, establishments_features_data):
     No Returns.
     """
 
-    df_raw = create_dataframe(establishments_features_labels, establishments_features_data)
-    df_trusted = treat_data(df_raw)
+    df_raw = pd.DataFrame()
+    for feature_index in range(len(establishments_features_data)):
+        df_raw[establishments_features_labels[feature_index]] = establishments_features_data[feature_index]
+
+    df_trusted = treat_data_request(df_raw)
     df_trusted.to_csv('data/output/establishments.csv', index=False)
 
 def delete_cat_google(categories_google):

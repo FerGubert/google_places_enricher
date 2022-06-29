@@ -86,7 +86,7 @@ def request_google_places():
     if len(df_categories) == 0:
         df_categories.loc[0] = ['']
 
-    establishments_features_data, establishments_features_labels = initialize_variables()
+    establishments_features_data, establishments_features_labels = initialize_variables_request()
 
     for lat_lon in df_latlon.iterrows():
         lat = lat_lon[1]['lat']
@@ -95,10 +95,10 @@ def request_google_places():
         for cat in df_categories['category']:
             establishments = []
 
-            url = create_url(lat, lon, cat)
+            url = create_url_request(lat, lon, cat)
             results = make_request(url)
             if not results['status'] == 'OK':
-                export_data(establishments_features_labels, establishments_features_data)
+                export_data_request(establishments_features_labels, establishments_features_data)
                 return '[ERROR] {:s}: {:s}\nHowever the data that could be collected were exported.'\
                         .format(results['status'], results['error_message'])
 
@@ -112,7 +112,7 @@ def request_google_places():
                 params['pagetoken'] = results['next_page_token']
                 results = make_request(url, params)
                 if not results['status'] == 'OK':
-                    export_data(establishments_features_labels, establishments_features_data)
+                    export_data_request(establishments_features_labels, establishments_features_data)
                     return '[ERROR] {:s}: {:s}.\nHowever the data that could be collected were exported.'\
                             .format(results['status'], results['error_message'])
                 establishments.extend(results['results'])
@@ -130,7 +130,7 @@ def request_google_places():
                 establishments_features_data[len(establishments_features_data)-1].append(cat)
 
 
-    export_data(establishments_features_labels, establishments_features_data)
+    export_data_request(establishments_features_labels, establishments_features_data)
     return 'Execution performed successfully.'
 
 def match_category_phrases():
