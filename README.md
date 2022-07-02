@@ -48,7 +48,7 @@ The calculated coordinates will be available in `data/output/lat_lon_calculated.
 
 ### Request Google Places API
 
-This flow performs requests to the google places API, according to the geographic coordinates defined in the input file and a predetermined radius. It enriches the data according to the categories also defined in the input file and handles the return of the api, making the data available in a csv file.
+This flow performs requests to the Google places API, according to the geographic coordinates defined in the input file and a predetermined radius. It enriches the data according to the categories also defined in the input file and handles the return of the API, making the data available in a csv file.
 
 First, it is necessary to set the variable described below in the file `config.py`:
 
@@ -56,7 +56,7 @@ First, it is necessary to set the variable described below in the file `config.p
 
 It is also necessary to provide in `data/input` a csv file with the geographic coordinates that will be used in the request, as indicated in the `lat_lon.csv` file. 
 
-If you want to enrich the data obtained from the google places API with more specific categories, a csv file with the desired categories must be made available in the same path or use the categories of the fourth hierarchical level of the Yelp base already available in `/data/input/categories.csv`.
+If you want to enrich the data obtained from the Google places API with more specific categories, a csv file with the desired categories must be made available in the same path or use the categories of the fourth hierarchical level of the Yelp base already available in `/data/input/categories_request.csv`.
 
 Then you must pass the argument that indicates this flow when executing the file `main.py`:
 
@@ -65,6 +65,20 @@ python src/main.py --flow request
 ```
 
 The processed data will be available in `data/output/establishments.csv`.
+
+### Matching Category Phrases
+
+This flow creates the Yelp phrases using the category hierarchical levels and creates the establishment phrases using the Google categories and the enrichment categories. The records of establishments with their phrases are exported in a csv file. Then, for each sentence of the establishment, it retrieves the Yelp sentence with the highest semantic textual similarity, making these matchings available with their respective scores in a csv file.
+
+To execute this flow, the `hierarchical_yelp_categories.csv` file is used, containing the 4 hierarchical levels of the Yelp categories, available in `data/input`. It is also necessary to have available in `data/output` the csv file with the establishments retrieved from the Google places API, without changing the column schema and the name `establishments.csv`. 
+
+Then you must pass the argument that indicates this flow when executing the file `main.py`:
+
+```
+python src/main.py --flow match
+```
+
+The data of the establishments with their phrases will be available in `data/output/establishments_phrases.csv` and the match of the phrases of the establishments with the phrases Yelp, as well as the score, will be available in `data/output/matching_category_phrases.csv`.
 
 ## 🤝 Members:
 

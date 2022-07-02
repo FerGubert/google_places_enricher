@@ -136,7 +136,7 @@ def request_google_places():
 def match_category_phrases():
     """
     Creates the Yelp phrases using the category hierarchical levels and creates the establishment phrases 
-    using the Google categories and the enrichment categories. The records of establishments with their phrases are available in a csv file. 
+    using the Google categories and the enrichment categories. The records of establishments with their phrases are exported in a csv file. 
     Then, for each sentence of the establishment, it retrieves the Yelp sentence with the highest semantic textual similarity, 
     making these matchings available with their respective scores in a csv file.
 
