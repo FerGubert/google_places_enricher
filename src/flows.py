@@ -53,7 +53,7 @@ def calculate_coordinates():
 
 def request_google_places():
     """
-    Performs requests to the google places API, according to the geographic coordinates
+    Performs requests to the Google places API, according to the geographic coordinates
     defined in the input file and a predetermined radius. 
     It enriches the data according to the categories also defined in the input file
     and handles the return of the API, making the data available in a csv file.
@@ -67,7 +67,7 @@ def request_google_places():
     FileNotFound
         If the coordinates or categories file is not found in the target folder.
     ErrorStatusMessage
-        if the google places API return has a status other than OK.
+        if the Google places API return has a status other than OK.
 
     Returns
     -------
@@ -134,6 +134,26 @@ def request_google_places():
     return 'Execution performed successfully.'
 
 def match_category_phrases():
+    """
+    Creates the Yelp phrases using the category hierarchical levels and creates the establishment phrases 
+    using the Google categories and the enrichment categories. The records of establishments with their phrases are available in a csv file. 
+    Then, for each sentence of the establishment, it retrieves the Yelp sentence with the highest semantic textual similarity, 
+    making these matchings available with their respective scores in a csv file.
+
+    Parameters
+    ----------
+    No Parameters.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    str
+        Message indicating the end of execution.
+    """
+
     df_categories_yelp = read_file('Hierarchical Yelp categories', 'data/input/hierarchical_yelp_categories.csv')
     df_categories_yelp['phrase_yelp'] = create_yelp_phrase(df_categories_yelp)
 
@@ -150,3 +170,5 @@ def match_category_phrases():
 
     df_score = calculate_similarity_sentences(df_estab_phrases_uniques['phrase_establishment'], df_categories_yelp['YelpPhrase'])
     df_score.to_csv('data/output/matching_category_phrases.csv', index=False)
+
+    return 'Execution performed successfully.'

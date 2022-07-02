@@ -41,7 +41,7 @@ def read_file(name, path_file, sep=';'):
 
 def initialize_variables_request():
     """
-    Initializes the main variables used in the google places API request.
+    Initializes the main variables used in the Google places API request.
 
     Parameters
     ----------
@@ -90,7 +90,7 @@ def initialize_variables_request():
 
 def create_url_request(lat, lon, cat):
     """
-    Creates the url that will be used to make the request to the google places API.
+    Creates the url that will be used to make the request to the Google places API.
 
     Parameters
     ----------
@@ -108,7 +108,7 @@ def create_url_request(lat, lon, cat):
     Returns
     -------
     str
-        Url for the request in the google places API.
+        Url for the request in the Google places API.
     """
 
     location = '&location={:s},{:s}'.format(str(lat), str(lon))
@@ -120,12 +120,12 @@ def create_url_request(lat, lon, cat):
 
 def make_request(url, params={}):
     """
-    Make the request to the google places API.
+    Make the request to the Google places API.
 
     Parameters
     ----------
     url: str
-        Url for the request in the google places API.
+        Url for the request in the Google places API.
     params: dict
         Parameters passed in the request.
 
@@ -214,16 +214,54 @@ def export_data_request(establishments_features_labels, establishments_features_
     df_trusted.to_csv('data/output/establishments.csv', index=False)
 
 def delete_cat_google(categories_google):
+    """
+    Remove Google categories that don't add value.
+
+    Parameters
+    ----------
+    categories_google: list
+        A list of all Google categories referring to an establishment.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    list
+        The list with only the Google categories of interest.
+    """
+
     new_cat_google = []
     for category in categories_google:
         if(category == 'point_of_interest') or (category == 'establishment'):
             continue
-    else:
-        new_cat_google.append(category)
+        else:
+            new_cat_google.append(category)
 
     return new_cat_google
 
 def convert_string_to_list(text, sep):
+    """
+    Treat the text, separate the words and convert to list.
+
+    Parameters
+    ----------
+    text: str
+        The text to be converted to list.
+    sep: str
+        The separator to use to separate the words.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    list
+        The list with the words of the text.
+    """
+
     list_final = []
     items = text.split(sep)
     for item in items:
@@ -232,6 +270,24 @@ def convert_string_to_list(text, sep):
     return list_final
 
 def create_yelp_phrase(df_categories_yelp):
+    """
+    Creates the yelp phrase joining the 4 hierarchical levels of the categories.
+
+    Parameters
+    ----------
+    df_categories_yelp: pandas.core.frame.DataFrame
+        Yelp data with 4 hierarchical levels.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    pandas.core.series.Series
+        The treated Yelp phrases.
+    """
+
     df_categories_yelp['phrase_yelp'] = df_categories_yelp[['parent_1', 'parent_2', 'parent_3', 'leaf']]\
                                     .apply(' '.join, axis=1)
     yelp_phrases = df_categories_yelp['phrase_yelp'].apply(lambda phrase: phrase\
@@ -240,6 +296,25 @@ def create_yelp_phrase(df_categories_yelp):
     return yelp_phrases
 
 def create_estab_phrase(df_estab):
+    """
+    Creates the phrases of the establishments from the Google categories and the enrichment categories. 
+    Each enrichment category is merged with all the Google categories of that establishment.
+
+    Parameters
+    ----------
+    df_estab: pandas.core.frame.DataFrame
+        The property data obtained from the Google places API.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    pandas.core.frame.DataFrame
+        The phrases of the establishments with their respective ID.
+    """
+
     df_categories_estab = df_estab[['place_id', 'categories', 'types']]
     df_categories_estab['types_list'] = df_categories_estab['types'].apply(lambda types: convert_string_to_list(types, ','))
     df_categories_estab['categories_google'] = df_categories_estab['types_list'].apply(lambda types_list: delete_cat_google(types_list))
@@ -264,6 +339,28 @@ def create_estab_phrase(df_estab):
     return df_categories_estab_phrases
 
 def calculate_similarity_sentences(sentences_estab, sentences_yelp):
+    """
+    Calculates the semantic textual similarity between the Yelp sentences and the establishments sentences, 
+    using a Sentence Transformer model to generate the embeddings and the cosine similarity to calculate the distance between the vectors.
+    And retrieves for each establishment sentence, the Yelp sentence with the highest score.
+
+    Parameters
+    ----------
+    sentences_estab: pandas.core.series.Series
+        The establishments sentences.
+    sentences_yelp: pandas.core.series.Series
+        The Yelp sentences.
+
+    Raises
+    ------
+    No Raises.
+
+    Returns
+    -------
+    pandas.core.frame.DataFrame
+        The establishments sentences combined with the best-scoring Yelp sentences.
+    """
+
     model = SentenceTransformer('all-MiniLM-L6-v2')
 
     embeddings_estab = model.encode(sentences_estab, convert_to_tensor=True)
