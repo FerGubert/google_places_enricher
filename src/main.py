@@ -2,6 +2,8 @@ from flows import calculate_coordinates, request_google_places
 from config import *
 import argparse
 
+from src.flows import match_category_phrases
+
 def main():
     """
     Retrieve the argument passed by the user.
@@ -40,6 +42,8 @@ if __name__== "__main__" :
         print(calculate_coordinates())
     elif (args.flow == 'request') and (RADIUS != 0):
         print(request_google_places())
+    elif args.flow == 'match':
+        print(match_category_phrases())
     else:
         print('[ERROR] Invalid environment variables or invalid argument.')
 
