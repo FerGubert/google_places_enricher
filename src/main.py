@@ -1,8 +1,6 @@
-from flows import calculate_coordinates, request_google_places
+from flows import calculate_coordinates, request_google_places, match_category_phrases
 from config import *
 import argparse
-
-from src.flows import match_category_phrases
 
 def main():
     """
