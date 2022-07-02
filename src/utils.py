@@ -143,6 +143,35 @@ def make_request(url, params={}):
     results = json.loads(res.content)
     return results
 
+def create_message_request(results):
+    """
+    Creates error message when request to Google places API fails.
+
+    Parameters
+    ----------
+    results: dict
+        The return of the Google places API.
+
+    Raises
+    ------
+    KeyError: 'error_message'
+        When the Google places API return does not have the 'error_message' field.
+
+    Returns
+    -------
+    str
+        The return message treated, with the status and, when possible, the descriptive text.
+    """
+
+    try:
+        return_message = '[ERROR] {:s}: {:s}\nHowever the data that could be collected were exported.'\
+            .format(results['status'], results['error_message'])
+    except:
+        return_message = '[ERROR] {:s}.\nHowever the data that could be collected were exported.'\
+            .format(results['status'])
+
+    return return_message
+
 def treat_data_request(df):
     """
     Performs a treatment on the data, eliminating the json format of the location field and 

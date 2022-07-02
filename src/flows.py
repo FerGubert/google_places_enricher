@@ -1,3 +1,4 @@
+from email import message
 from config import RADIUS, NORTHEAST_LAT, NORTHEAST_LON, SOUTHWEST_LAT, SOUTHWEST_LON
 from utils import *
 import time
@@ -99,8 +100,7 @@ def request_google_places():
             results = make_request(url)
             if not results['status'] == 'OK':
                 export_data_request(establishments_features_labels, establishments_features_data)
-                return '[ERROR] {:s}: {:s}\nHowever the data that could be collected were exported.'\
-                        .format(results['status'], results['error_message'])
+                return create_message_request(results)
 
             establishments.extend(results['results'])
 
@@ -113,8 +113,7 @@ def request_google_places():
                 results = make_request(url, params)
                 if not results['status'] == 'OK':
                     export_data_request(establishments_features_labels, establishments_features_data)
-                    return '[ERROR] {:s}: {:s}.\nHowever the data that could be collected were exported.'\
-                            .format(results['status'], results['error_message'])
+                    return create_message_request(results)
                 establishments.extend(results['results'])
                 time.sleep(2)
 
@@ -128,7 +127,6 @@ def request_google_places():
                         establishments_features_data[feature_index].append(None)
                 
                 establishments_features_data[len(establishments_features_data)-1].append(cat)
-
 
     export_data_request(establishments_features_labels, establishments_features_data)
     return 'Execution performed successfully.'
