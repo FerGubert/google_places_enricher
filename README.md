@@ -26,7 +26,7 @@ pip install .
 
 ## 🚀 Run:
 
-This tool provides two different flows, the flow you want to run must be passed as an argument when executing the main. Below are the details of each flow.
+This tool provides three different flows, the flow you want to run must be passed as an argument when executing the main. Below are the details of each flow.
 
 ### Calculate Coordinates
 
