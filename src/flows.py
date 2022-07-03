@@ -152,10 +152,10 @@ def match_category_phrases():
         Message indicating the end of execution.
     """
 
-    df_categories_yelp = read_file('Hierarchical Yelp categories', 'data/input/hierarchical_yelp_categories.csv')
+    df_categories_yelp = read_file('Hierarchical Yelp categories', 'data/input/hierarchical_yelp_categories.csv', sep=',')
     df_categories_yelp['phrase_yelp'] = create_yelp_phrase(df_categories_yelp)
 
-    df_estab = read_file('Establishments', 'data/output/establishments.csv')
+    df_estab = read_file('Establishments', 'data/output/establishments.csv', sep=',')
     df_categories_estab_phrases = create_estab_phrase(df_estab)
 
     df_estab_phrases = df_categories_estab_phrases.merge(df_estab, on='place_id', how='left')
@@ -165,8 +165,9 @@ def match_category_phrases():
     df_estab_phrases_uniques = df_categories_estab_phrases.drop_duplicates(subset="phrase_establishment")[['phrase_establishment']]
     df_estab_phrases_uniques['words_phrase_estab'] = df_estab_phrases_uniques['phrase_establishment'].apply(lambda frase: len(frase.split(' ')))
     df_estab_phrases_uniques = df_estab_phrases_uniques[df_estab_phrases_uniques['words_phrase_estab'] > 1]
+    df_estab_phrases_uniques = df_estab_phrases_uniques.reset_index()
 
-    df_score = calculate_similarity_sentences(df_estab_phrases_uniques['phrase_establishment'], df_categories_yelp['YelpPhrase'])
+    df_score = calculate_similarity_sentences(df_estab_phrases_uniques['phrase_establishment'], df_categories_yelp['phrase_yelp'])
     df_score.to_csv('data/output/matching_category_phrases.csv', index=False)
 
     return 'Execution performed successfully.'

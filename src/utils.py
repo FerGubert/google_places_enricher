@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import re
 from sentence_transformers import SentenceTransformer, util
+import warnings
+from pandas.core.common import SettingWithCopyWarning
 
 def read_file(name, path_file, sep=';'):
     """
@@ -343,6 +345,8 @@ def create_estab_phrase(df_estab):
     pandas.core.frame.DataFrame
         The phrases of the establishments with their respective ID.
     """
+
+    warnings.simplefilter(action='ignore', category=SettingWithCopyWarning)
 
     df_categories_estab = df_estab[['place_id', 'categories', 'types']]
     df_categories_estab['types_list'] = df_categories_estab['types'].apply(lambda types: convert_string_to_list(types, ','))
