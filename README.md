@@ -66,7 +66,7 @@ python src/main.py --task request
 
 The processed data will be available in `data/output/establishments.csv`.
 
-### Matching Category Phrases
+#### 3-Matching Categories
 
 This task explores the information in the branch of the category in the hierarchy where it is located – if available. For instance, it creates Yelp sentences using the category hierarchical levels names; for Google Places it creates the establishment sentences using the Google categories and the enrichment categories. The records of establishments with their sentences are exported in a CSV file. Then, for each sentence of the establishment, it retrieves the Yelp sentence with the highest semantic textual similarity, making these matchings available with their respective scores in a CSV file.
 
