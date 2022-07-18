@@ -160,7 +160,7 @@ def match_category_phrases():
 
     df_estab_phrases = df_categories_estab_phrases.merge(df_estab, on='place_id', how='left')
     df_estab_phrases.drop(columns=['categories', 'types'], inplace=True)
-    df_estab_phrases.to_csv('data/output/establishments_phrases.csv', index=False)
+    df_estab_phrases.to_csv('data/output/establishments_sentences.csv', index=False)
 
     df_estab_phrases_uniques = df_categories_estab_phrases.drop_duplicates(subset="phrase_establishment")[['phrase_establishment']]
     df_estab_phrases_uniques['words_phrase_estab'] = df_estab_phrases_uniques['phrase_establishment'].apply(lambda frase: len(frase.split(' ')))
@@ -168,6 +168,6 @@ def match_category_phrases():
     df_estab_phrases_uniques = df_estab_phrases_uniques.reset_index()
 
     df_score = calculate_similarity_sentences(df_estab_phrases_uniques['phrase_establishment'], df_categories_yelp['phrase_yelp'])
-    df_score.to_csv('data/output/matching_category_phrases.csv', index=False)
+    df_score.to_csv('data/output/matching_category_sentences.csv', index=False)
 
     return 'Execution performed successfully.'

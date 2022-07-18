@@ -21,7 +21,7 @@ def main():
     """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--flow', dest='flow')
+    parser.add_argument('--task', dest='task')
     args = parser.parse_args()
 
     return args
@@ -36,11 +36,11 @@ if __name__== "__main__" :
                 SOUTHWEST_LAT,
                 SOUTHWEST_LON]
 
-    if (args.flow == 'coordinates') and (all(env_vars)):
+    if (args.task == 'coordinates') and (all(env_vars)):
         print(calculate_coordinates())
-    elif (args.flow == 'request') and (RADIUS != 0):
+    elif (args.task == 'request') and (RADIUS != 0):
         print(request_google_places())
-    elif args.flow == 'match':
+    elif args.task == 'match':
         print(match_category_phrases())
     else:
         print('[ERROR] Invalid environment variables or invalid argument.')
