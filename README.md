@@ -75,7 +75,7 @@ To execute this flow, the `hierarchical_yelp_categories.csv` file is used, conta
 Then it is necessary to inform the argument that indicates this flow when executing the file `main.py`:
 
 ```
-python src/main.py --flow match
+python src/main.py --task match
 ```
 
 The data of the establishments with their sentences will be available in `data/output/establishments_sentences.csv` and the match of the sentences of the establishments with the Yelp sentences, as well as the score, will be available in `data/output/matching_category_sentences.csv`.
