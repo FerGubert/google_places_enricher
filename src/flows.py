@@ -36,9 +36,9 @@ def calculate_coordinates():
     transformed_ne = to_proxy_transformer.transform(ne.x, ne.y)
 
     gridpoints = []
-    x = transformed_sw[0] + stepsize
+    x = transformed_sw[0] + RADIUS
     while x < transformed_ne[0]:
-        y = transformed_sw[1] + stepsize
+        y = transformed_sw[1] + RADIUS
         while y < transformed_ne[1]:
             p = shapely.geometry.Point(to_original_transformer.transform(x, y))
             gridpoints.append(p)
