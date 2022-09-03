@@ -30,15 +30,15 @@ def calculate_coordinates():
     sw = shapely.geometry.Point(SOUTHWEST_LAT, SOUTHWEST_LON)
     ne = shapely.geometry.Point(NORTHEAST_LAT, NORTHEAST_LON)
 
-    stepsize = RADIUS*2
+    stepsize = RADIUS+(RADIUS/2)
 
     transformed_sw = to_proxy_transformer.transform(sw.x, sw.y)
     transformed_ne = to_proxy_transformer.transform(ne.x, ne.y)
 
     gridpoints = []
-    x = transformed_sw[0] + RADIUS
+    x = transformed_sw[0] + (3/4*RADIUS)
     while x < transformed_ne[0]:
-        y = transformed_sw[1] + RADIUS
+        y = transformed_sw[1] + (3/4*RADIUS)
         while y < transformed_ne[1]:
             p = shapely.geometry.Point(to_original_transformer.transform(x, y))
             gridpoints.append(p)
